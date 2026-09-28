@@ -293,12 +293,6 @@ h2 { font-size: clamp(1.9rem, 3.2vw, 2.7rem); }
 
 .front h3 { margin: 0 28px 8px; font-size: 1.5rem; }
 .front > p { margin: 0 28px 14px; color: var(--color-text-soft); }
-.front .front-subtitle { font-family: var(--font-heading); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--color-text); margin-top: 6px; margin-bottom: 10px; }
-.front-milestones, .front-reasons { list-style: none; margin: 0 28px 18px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.front-milestones li { display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: baseline; font-size: .92rem; }
-.front-milestones strong { font-family: var(--font-heading); color: var(--front-color); }
-.front-reasons li { position: relative; padding-left: 20px; font-size: .92rem; color: var(--color-text); }
-.front-reasons li::before { content: ""; position: absolute; left: 0; top: .5em; width: 9px; height: 9px; border-radius: 50%; background: var(--front-color); }
 .front .text-link { margin: auto 28px 0; }
 
 @media (min-width: 980px) {
