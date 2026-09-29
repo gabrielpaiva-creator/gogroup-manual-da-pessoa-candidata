@@ -256,10 +256,7 @@ h2 { font-size: clamp(1.9rem, 3.2vw, 2.7rem); }
   background: var(--color-accent); border-radius: var(--radius-card); padding: 26px 24px 28px;
   box-shadow: var(--shadow-soft);
 }
-.fronts-hub-name { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2rem, 6vw, 2.8rem); line-height: 1; color: var(--color-primary); margin: 0 0 10px; letter-spacing: -.02em; }
-.fronts-hub-caption { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--color-text); margin: 0 0 12px; }
-.fronts-hub-teams { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-.fronts-hub-teams li { background: var(--color-white); color: var(--color-text); border-radius: var(--radius-pill); padding: 6px 14px; font-size: .82rem; font-weight: 700; }
+.fronts-hub-name { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2rem, 6vw, 2.8rem); line-height: 1; color: var(--color-primary); margin: 0; letter-spacing: -.02em; }
 
 /* conectores: uma linha desce do hub e se abre para as três frentes */
 .fronts { --front-gap: 24px; list-style: none; margin: 0; padding: 48px 0 0; display: grid; gap: var(--front-gap); position: relative; }
