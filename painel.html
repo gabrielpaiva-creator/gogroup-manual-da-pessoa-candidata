@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Painel do Manual Gogroup</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap">
+<style>
+  :root { color-scheme: light dark; }
+  /* Layout: faixa de totais no topo, depois jogos e links lado a lado, série de acessos por hora embaixo. */
+  :root {
+    --bg: #EAF2FB; --surface: #FFFFFF; --ink: #0A3D7A; --soft: #4D6D96; --line: #D2E7FA;
+    --brand: #2659A5; --lime: #D7D900; --ok: #1F9D55; --bad: #E5273C;
+    --font-h: 'Poppins', 'Nunito Sans', system-ui, sans-serif;
+    --font-b: 'Nunito Sans', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #0B1B31; --surface: #12294A; --ink: #E6F0FC; --soft: #93B0D4; --line: #1F3C66;
+    --brand: #6FA3EA; --lime: #D7D900; --ok: #4CC58A; --bad: #FF6B7D; color-scheme: dark; } }
+  :root[data-theme="dark"] {
+    --bg: #0B1B31; --surface: #12294A; --ink: #E6F0FC; --soft: #93B0D4; --line: #1F3C66;
+    --brand: #6FA3EA; --lime: #D7D900; --ok: #4CC58A; --bad: #FF6B7D; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-b); font-size: 15px; margin: 0; padding-inline: 16px; padding-block: 24px 40px; }
+  main { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+  h1, h2 { font-family: var(--font-h); margin: 0; line-height: 1.15; text-wrap: balance; }
+  h1 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; letter-spacing: -.02em; }
+  h2 { font-size: 1rem; font-weight: 700; }
+  header { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: flex-end; }
+  .sub { color: var(--soft); margin: 4px 0 0; }
+  .live { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--soft); font-variant-numeric: tabular-nums; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--soft); }
+  .live.on .dot { background: var(--ok); animation: pulse 2s infinite; }
+  .live.err .dot { background: var(--bad); }
+  @keyframes pulse { 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { .live.on .dot { animation: none; } }
+  .totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .tile { background: var(--surface); border-radius: 14px; padding: 16px 18px; min-width: 0; }
+  .tile.hero { background: var(--brand); color: #fff; }
+  .tile.hero .lab, .tile.hero .sm { color: #DCE9FB; }
+  .lab { font-family: var(--font-h); font-weight: 700; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--soft); }
+  .big { font-family: var(--font-h); font-weight: 800; font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.1; font-variant-numeric: tabular-nums; margin: 6px 0 2px; }
+  .sm { font-size: .82rem; color: var(--soft); font-variant-numeric: tabular-nums; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; }
+  section { background: var(--surface); border-radius: 14px; padding: 18px; min-width: 0; display: grid; gap: 14px; align-content: start; }
+  .games { display: grid; gap: 16px; }
+  .game-name { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+  .game-name strong { font-family: var(--font-h); font-size: 1.05rem; }
+  .rate { font-size: .82rem; color: var(--soft); font-variant-numeric: tabular-nums; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  .pair div { background: var(--bg); border-radius: 10px; padding: 10px 12px; }
+  .pair b { display: block; font-family: var(--font-h); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+  .pair span { font-size: .78rem; color: var(--soft); }
+  .bar { height: 8px; border-radius: 8px; background: var(--line); overflow: hidden; margin-top: 10px; }
+  .bar i { display: block; height: 100%; background: var(--lime); border-radius: 8px; transition: width .4s; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; }
+  li .nm { overflow-wrap: anywhere; font-weight: 600; }
+  li .nv { font-family: var(--font-h); font-weight: 700; font-variant-numeric: tabular-nums; }
+  li .tr { grid-column: 1 / -1; height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; }
+  li .tr i { display: block; height: 100%; background: var(--brand); border-radius: 6px; transition: width .4s; }
+  li.zero .nm, li.zero .nv { color: var(--soft); font-weight: 400; }
+  .group { font-family: var(--font-h); font-weight: 700; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--soft); margin-top: 6px; }
+  .spark { display: flex; align-items: flex-end; gap: 3px; height: 120px; }
+  .spark div { flex: 1; min-width: 0; background: var(--brand); border-radius: 3px 3px 0 0; min-height: 2px; opacity: .85; }
+  .spark div.last { background: var(--lime); opacity: 1; }
+  .axis { display: flex; justify-content: space-between; font-size: .75rem; color: var(--soft); font-variant-numeric: tabular-nums; }
+  .hist-head { display: flex; flex-wrap: wrap; gap: 10px 16px; justify-content: space-between; align-items: center; }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 4px; background: var(--bg); padding: 4px; border-radius: 10px; }
+  .seg button { font: inherit; font-weight: 600; font-size: .82rem; color: var(--soft); background: transparent; border: 0; border-radius: 7px; padding: 6px 12px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--brand); color: #fff; }
+  .seg button:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+  .msg { background: var(--surface); border-radius: 14px; padding: 18px; border-left: 4px solid var(--bad); }
+  .msg[hidden] { display: none; }
+</style>
+</head>
+<body>
+
+<main>
+  <header>
+    <div>
+      <h1>Painel do Manual Gogroup</h1>
+      <p class="sub">Acessos, jogos e cliques em links do Manual da Pessoa Candidata.</p>
+    </div>
+    <div class="live" id="live"><span class="dot"></span><span id="liveTxt">Conectando...</span></div>
+  </header>
+
+  <div class="msg" id="msg" hidden></div>
+
+  <div class="totals">
+    <div class="tile hero"><div class="lab">Acessos ao manual · acumulado</div><div class="big" id="tAcessos">-</div><div class="sm" id="tAcessos24">últimas 24h: -</div></div>
+    <div class="tile"><div class="lab">Jogos concluídos · acumulado</div><div class="big" id="tJogos">-</div><div class="sm" id="tJogos24">últimas 24h: -</div></div>
+    <div class="tile"><div class="lab">Cliques em links · acumulado</div><div class="big" id="tLinks">-</div><div class="sm" id="tLinks24">últimas 24h: -</div></div>
+  </div>
+
+  <div class="cols">
+    <section>
+      <h2>Gamificações</h2>
+      <div class="games" id="games"></div>
+    </section>
+    <section>
+      <h2>Cliques por link</h2>
+      <ul id="links"></ul>
+    </section>
+  </div>
+
+  <section>
+    <div class="hist-head">
+      <h2>Histórico por dia</h2>
+      <div class="seg" id="seg" role="group" aria-label="Métrica do histórico">
+        <button type="button" data-m="acessos" aria-pressed="true">Acessos</button>
+        <button type="button" data-m="jogos" aria-pressed="false">Jogos concluídos</button>
+        <button type="button" data-m="cliques" aria-pressed="false">Cliques</button>
+      </div>
+    </div>
+    <div class="sm" id="histInfo">-</div>
+    <div class="spark" id="hist" role="img" aria-label="Histórico diário"></div>
+    <div class="axis"><span id="hA">-</span><span id="hB">-</span></div>
+  </section>
+
+  <section>
+    <h2>Acessos por hora, últimas 24h</h2>
+    <div class="spark" id="spark" role="img" aria-label="Acessos por hora nas últimas 24 horas"></div>
+    <div class="axis"><span id="axA">-</span><span>agora</span></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var URL_RPC = 'https://uiqgrzdyhwiyhonbdowb.supabase.co/rest/v1/rpc/manual_painel', KEY = 'sb_publishable_2kByb7whDkzUVfzj_QNYpQ_B--i3Bx9', EVERY = 5000;
+  var GAMES = [
+    { id: 'test_drive', nome: 'Test Drive' },
+    { id: 'quiz_mantras', nome: 'Quiz dos mantras' }
+  ];
+  var LINKS = [
+    ['Marcas do grupo', [
+      ['Gocase', 'gocase.com.br'], ['AZ', 'mercadolivre.com.br/loja/azbuy'], ['Apice Cosméticos', 'apicecosmeticos.com.br'],
+      ['Jump Ventures', 'jumpventures.co'], ['Barbours Beauty', 'thebarboursbeauty.com.br'], ['Lescent', 'lescent.com.br'],
+      ['Rituária', 'rituaria.com.br'], ['Kokeshi', 'kokeshi.com.br'], ['By Samia', 'bysamia.com.br'],
+      ['Aua Natural', 'auanatural.com.br'], ['Yenzah', 'yenzah.com.br'], ['DenaVita', 'denavita.com.br']]],
+    ['Processo seletivo', [
+      ['Vagas abertas', 'carreira.inhire.com.br/carreiras/gogroup'], ['GoHelp', 'gohelp.devgogroup.com']]],
+    ['Conteúdo e redes', [
+      ['Vídeo institucional', 'youtu.be/zHWS3QIA4cE'], ['Instagram', 'instagram.com/universogogroup'],
+      ['Facebook', 'facebook.com/universogogroup'], ['LinkedIn', 'linkedin.com/company/gocase-global']]]
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (n) { return Number(n || 0).toLocaleString('pt-BR'); };
+  var busy = false, lastOk = 0;
+
+  var lastData = null, metric = 'acessos';
+  var NOMES = { acessos: 'acessos', jogos: 'jogos concluídos', cliques: 'cliques em links' };
+  function renderHist() {
+    var d = lastData; if (!d) return;
+    var dias = d.dias || [], h = $('hist'); h.textContent = '';
+    var total = dias.reduce(function (a, x) { return a + x[metric]; }, 0);
+    var dmax = Math.max.apply(null, dias.map(function (x) { return x[metric]; }).concat(1));
+    var fd = function (iso) { var p = iso.slice(0, 10).split('-'); return p[2] + '/' + p[1]; };
+    dias.forEach(function (x, i) {
+      var b = document.createElement('div');
+      if (i === dias.length - 1) b.className = 'last';
+      b.style.height = Math.max(2, x[metric] / dmax * 100) + '%';
+      b.title = fd(x.dia) + ': ' + x[metric] + ' ' + NOMES[metric];
+      h.appendChild(b);
+    });
+    $('histInfo').textContent = dias.length
+      ? fmt(total) + ' ' + NOMES[metric] + ' desde ' + fd(dias[0].dia) + ' (' + dias.length + (dias.length === 1 ? ' dia' : ' dias') + ')'
+      : 'Ainda sem registros.';
+    $('hA').textContent = dias.length ? fd(dias[0].dia) : '-';
+    $('hB').textContent = dias.length ? 'hoje' : '-';
+  }
+  document.getElementById('seg').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-m]'); if (!b) return;
+    metric = b.getAttribute('data-m');
+    this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    renderHist();
+  });
+  function setLive(state, txt) {
+    $('live').className = 'live ' + state;
+    $('liveTxt').textContent = txt;
+  }
+  function showMsg(txt) { var m = $('msg'); m.textContent = txt; m.hidden = !txt; }
+
+  function render(d) {
+    var by = {}, sum = { acesso: [0, 0], jogo_concluido: [0, 0], link_clique: [0, 0] };
+    d.totais.forEach(function (r) {
+      by[r.tipo + '|' + r.alvo] = r;
+      if (sum[r.tipo]) { sum[r.tipo][0] += r.n; sum[r.tipo][1] += r.n24; }
+    });
+    $('tAcessos').textContent = fmt(sum.acesso[0]);
+    $('tAcessos24').textContent = 'últimas 24h: ' + fmt(sum.acesso[1]);
+    $('tJogos').textContent = fmt(sum.jogo_concluido[0]);
+    $('tJogos24').textContent = 'últimas 24h: ' + fmt(sum.jogo_concluido[1]);
+    $('tLinks').textContent = fmt(sum.link_clique[0]);
+    $('tLinks24').textContent = 'últimas 24h: ' + fmt(sum.link_clique[1]);
+
+    var g = $('games'); g.textContent = '';
+    GAMES.forEach(function (game) {
+      var ini = (by['jogo_iniciado|' + game.id] || {}).n || 0;
+      var fim = (by['jogo_concluido|' + game.id] || {}).n || 0;
+      var ini24 = (by['jogo_iniciado|' + game.id] || {}).n24 || 0;
+      var fim24 = (by['jogo_concluido|' + game.id] || {}).n24 || 0;
+      var pct = ini ? Math.min(100, Math.round(fim / ini * 100)) : 0;
+      var box = document.createElement('div');
+      var head = document.createElement('div'); head.className = 'game-name';
+      var nm = document.createElement('strong'); nm.textContent = game.nome;
+      var rt = document.createElement('span'); rt.className = 'rate'; rt.textContent = ini ? pct + '% chegam ao fim' : 'sem partidas ainda';
+      head.append(nm, rt);
+      var pair = document.createElement('div'); pair.className = 'pair';
+      [['Começaram', ini, ini24], ['Terminaram', fim, fim24]].forEach(function (x) {
+        var c = document.createElement('div');
+        var b = document.createElement('b'); b.textContent = fmt(x[1]);
+        var s = document.createElement('span'); s.textContent = x[0] + ' (24h: ' + fmt(x[2]) + ')';
+        c.append(b, s); pair.appendChild(c);
+      });
+      var bar = document.createElement('div'); bar.className = 'bar';
+      var fill = document.createElement('i'); fill.style.width = pct + '%'; bar.appendChild(fill);
+      box.append(head, pair, bar); g.appendChild(box);
+    });
+
+    var max = 1, known = {};
+    LINKS.forEach(function (grp) { grp[1].forEach(function (l) { known[l[1]] = 1; max = Math.max(max, (by['link_clique|' + l[1]] || {}).n || 0); }); });
+    var extras = d.totais.filter(function (r) { return r.tipo === 'link_clique' && !known[r.alvo]; });
+    extras.forEach(function (r) { max = Math.max(max, r.n); });
+    var ul = $('links'); ul.textContent = '';
+    function row(name, n, n24) {
+      var li = document.createElement('li'); if (!n) li.className = 'zero';
+      var a = document.createElement('span'); a.className = 'nm'; a.textContent = name;
+      var v = document.createElement('span'); v.className = 'nv'; v.textContent = fmt(n) + (n24 ? '  (+' + fmt(n24) + ' em 24h)' : '');
+      var tr = document.createElement('span'); tr.className = 'tr';
+      var f = document.createElement('i'); f.style.width = (n / max * 100) + '%'; tr.appendChild(f);
+      li.append(a, v, tr); ul.appendChild(li);
+    }
+    function grp(t) { var li = document.createElement('li'); li.className = 'group'; li.style.display = 'block'; li.textContent = t; ul.appendChild(li); }
+    LINKS.forEach(function (gr) {
+      grp(gr[0]);
+      gr[1].forEach(function (l) { var r = by['link_clique|' + l[1]] || {}; row(l[0], r.n || 0, r.n24 || 0); });
+    });
+    if (extras.length) { grp('Outros destinos'); extras.forEach(function (r) { row(r.alvo, r.n, r.n24); }); }
+
+    var sp = $('spark'); sp.textContent = '';
+    var smax = Math.max.apply(null, d.serie.map(function (s) { return s.n; }).concat(1));
+    d.serie.forEach(function (s, i) {
+      var b = document.createElement('div');
+      if (i === d.serie.length - 1) b.className = 'last';
+      b.style.height = Math.max(2, s.n / smax * 100) + '%';
+      var h = new Date(s.h);
+      b.title = h.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + ': ' + s.n + ' acessos';
+      sp.appendChild(b);
+    });
+    lastData = d; renderHist();
+    if (d.serie.length) $('axA').textContent = new Date(d.serie[0].h).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function tick() {
+    if (busy) return; busy = true;
+    try {
+      var res = await fetch(URL_RPC, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + KEY }, body: '{}', cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      render(await res.json()); showMsg('');
+      lastOk = Date.now();
+      setLive('on', 'Ao vivo, atualiza a cada 5 s');
+    } catch (e) {
+      showMsg('Não foi possível buscar os números agora. Tentando de novo em instantes.');
+      setLive('err', lastOk ? 'Última atualização ' + new Date(lastOk).toLocaleTimeString('pt-BR') : 'Sem conexão');
+    } finally { busy = false; }
+  }
+
+  render({ totais: [], serie: [], dias: [] });
+  tick(); setInterval(tick, EVERY);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
+})();
+</script>
+</body>
+</html>
