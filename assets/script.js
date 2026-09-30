@@ -3,6 +3,31 @@
 
   var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ---------- Métricas de uso (alimenta o painel em tempo real) ---------- */
+  var METRICS_URL = 'https://uiqgrzdyhwiyhonbdowb.supabase.co/rest/v1/manual_eventos';
+  var METRICS_KEY = 'sb_publishable_2kByb7whDkzUVfzj_QNYpQ_B--i3Bx9';
+  function track(tipo, alvo) {
+    if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) return;
+    try {
+      fetch(METRICS_URL, {
+        method: 'POST',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json', apikey: METRICS_KEY, Authorization: 'Bearer ' + METRICS_KEY, Prefer: 'return=minimal' },
+        body: JSON.stringify({ tipo: tipo, alvo: String(alvo || '').slice(0, 200) })
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  (function () {
+    var seen = false;
+    try { seen = sessionStorage.getItem('manual-acesso') === '1'; sessionStorage.setItem('manual-acesso', '1'); } catch (e) {}
+    if (!seen) track('acesso', location.hostname);
+  })();
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || !/^https?:/i.test(a.href) || a.hostname === location.hostname) return;
+    track('link_clique', a.href.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, ''));
+  });
+
   function shuffle(arr) {
     var a = arr.slice();
     for (var i = a.length - 1; i > 0; i--) {
@@ -460,6 +485,7 @@
   }
 
   function startGame() {
+    track('jogo_iniciado', 'test_drive');
     var m = shuffle(MOTORISTA).slice(0, ROUND / 2).map(function (t) { return { text: t, type: 'motorista' }; });
     var p = shuffle(PASSAGEIRO).slice(0, ROUND / 2).map(function (t) { return { text: t, type: 'passageiro' }; });
     deck = shuffle(m.concat(p));
@@ -517,6 +543,7 @@
     screens.result.querySelector('[data-drive-result-title]').textContent = title;
     showScreen('result');
     scoreTitle.focus({ preventScroll: true });
+    track('jogo_concluido', 'test_drive');
     unlock('drive');
   }
 
@@ -645,7 +672,9 @@
   resultName.tabIndex = -1;
   var rounds = [], answers = [], round = 0, quizLocked = false, topMantra = 0;
 
+  var quizTracked = false;
   function startQuiz() {
+    quizTracked = false;
     rounds = PROMPTS.map(function (_, r) { return shuffle([0, 1, 2, 3, 4]).map(function (m) { return { m: m, text: MANTRA_STATEMENTS[m][r] }; }); });
     answers = []; round = 0; quizLocked = false;
     quizResult.hidden = true;
@@ -679,6 +708,7 @@
   function pick(btn, m) {
     if (quizLocked) return;
     quizLocked = true;
+    if (round === 0 && !quizTracked) { quizTracked = true; track('jogo_iniciado', 'quiz_mantras'); }
     btn.classList.add('is-picked');
     answers[round] = m;
     setTimeout(function () {
@@ -736,6 +766,7 @@
     quizPlay.hidden = true;
     quizResult.hidden = false;
     resultName.focus({ preventScroll: true });
+    track('jogo_concluido', 'quiz_mantras');
     unlock('mantra');
   }
 
